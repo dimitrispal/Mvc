@@ -33,8 +33,7 @@ namespace MoviesHub
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            //var connection = @"Server=(localdb)\SOTIRIS-HP-OMEN;Database=MoviesMvc;Trusted_Connection=True;ConnectRetryCount=0";
-            var connection = "Data Source=SOTIRIS-HP-OMEN;Database=MoviesMvc;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=MoviesMvc;Trusted_Connection=True;ConnectRetryCount=0"; 
 
             services.AddDbContext<MoviesMvcContext>(
 	        options => options.UseSqlServer(connection)); 
