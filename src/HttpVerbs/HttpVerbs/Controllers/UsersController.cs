@@ -7,14 +7,15 @@
     using Microsoft.AspNetCore.Http;
 
     using HttpVerbs.Models;
+    using System.Text.RegularExpressions;
 
-    [Route("posts")]
-    public class PostsController : Controller
+    [Route("users")]
+    public class UsersController : Controller
     {
         private Store store_;
 
         [HttpGet("{id?}")]
-        public ActionResult Index(int? id, int? authorId)
+        public ActionResult Index(int? id)
         {
             var token = GetToken();
 
@@ -22,44 +23,21 @@
                 return Unauthorized();
             }
 
-            var posts = store_.Posts;
+            var users = store_.Users;
 
             if (id != null) {
-                var result = posts.SingleOrDefault(p => p.PostId == id);
+                var result = users.SingleOrDefault(u => u.UserId == id);
 
                 return result == null
                     ? (ActionResult)NotFound()
                     : (ActionResult)Json(result);
             }
 
-            if (authorId != null) {
-                posts = posts.Where(p => p.AuthorId == authorId).ToList();
-            }
-            
-            return Json(posts);
+            return Json(users);
         }
-
-        [HttpGet("{id}/tags")]
-        public ActionResult Tags(int id)
-        {
-            var token = GetToken();
-
-            if (token == null) {
-                return Unauthorized();
-            }
-
-            var post = store_.Posts.SingleOrDefault(p => p.PostId == id);
-
-            if (post == null) {
-                return NotFound();
-            }
-
-            return Json(post.Tags);
-        }
-
 
         [HttpPost]
-        public ActionResult Create([FromBody] Post post)
+        public ActionResult Create([FromBody] User user)
         {
             var token = GetToken();
 
@@ -67,22 +45,22 @@
                 return Unauthorized();
             }
 
-            if (post.PostId != 0) {
-                return BadRequest("Cannot specify Post Id manually");
+            if (user.UserId != 0) {
+                return BadRequest("Cannot specify User Id manually");
             }
 
             // generate random id
-            post.PostId = new Random().Next();
+            user.UserId = new Random().Next();
 
-            var result = ValidatePost(post);
+            var result = ValidateUser(user);
 
             if (result.Status != StatusCodes.Status200OK) {
                 return StatusCode(result.Status, result.Text);
             }
 
-            store_.Posts.Add(post);
+            store_.Users.Add(user);
 
-            return Created($"/posts/{post.PostId}", post);
+            return Created($"/users/{user.UserId}", user);
         }
 
         private Result ValidatePost(Post post)
@@ -102,8 +80,25 @@
             return new Result(StatusCodes.Status200OK);
         }
 
+        private Result ValidateUser(User user)
+        {
+            if (store_.Users.Any(u => u.UserId == user.UserId)) {
+                return new Result(StatusCodes.Status409Conflict, "User exists");
+            }
+
+            if (string.IsNullOrWhiteSpace(user.Name)) {
+                return new Result(StatusCodes.Status400BadRequest, "Name cannot be empty");
+            }
+
+            if (!Regex.IsMatch(user.Email ?? "", @"^\w+@\w+\.\w{1,}$")) {
+                return new Result(StatusCodes.Status400BadRequest, "Email must consist only of A-Z, a-z, 0-9 and _");
+            }
+
+            return new Result(StatusCodes.Status200OK);
+        }
+
         [HttpPut("{id}")]
-        public ActionResult Update(int id, [FromBody] Post post)
+        public ActionResult Update(int id, [FromBody] User user)
         {
             var token = GetToken();
 
@@ -111,32 +106,30 @@
                 return Unauthorized();
             }
 
-            var dbPost = store_.Posts.SingleOrDefault(p => p.PostId == id);
+            var dbUser = store_.Users.SingleOrDefault(u => u.UserId == id);
             
-            if (dbPost == null) {
+            if (dbUser == null) {
                 return NotFound();
             }
 
-            if (post.PostId != 0) {
-                return BadRequest("Cannot specify postId in body");
+            if (user.UserId != 0) {
+                return BadRequest("Cannot specify userId in body");
             }
 
-            var result = ValidatePost(post);
+            var result = ValidateUser(user);
 
             if (result.Status != StatusCodes.Status200OK) {
                 return StatusCode(result.Status, result.Text);
             }
 
-            dbPost.Body = post.Body;
-            dbPost.Title = post.Title;
-            dbPost.Created = post.Created;
-            dbPost.AuthorId = post.AuthorId;
+            dbUser.Email = user.Email;
+            dbUser.Name = user.Name;
 
             return Ok();
         }
 
         [HttpPatch("{id}")]
-        public ActionResult Patch(int id, [FromBody] Post post)
+        public ActionResult Patch(int id, [FromBody] User user)
         {
             var token = GetToken();
 
@@ -144,35 +137,26 @@
                 return Unauthorized();
             }
 
-            var dbPost = store_.Posts.SingleOrDefault(p => p.PostId == id);
+            var dbUser = store_.Users.SingleOrDefault(u => u.UserId == id);
             
-            if (dbPost == null) {
+            if (dbUser == null) {
                 return NotFound();
             }
 
-            if (post.PostId != 0) {
-                return BadRequest("Cannot specify postId in body");
+            if (user.UserId != 0) {
+                return BadRequest("Cannot specify userId in body");
             }
 
-            if (post.AuthorId != 0 && post.AuthorId != dbPost.AuthorId) {
+            if (!string.IsNullOrWhiteSpace(user.Name)) {
+                dbUser.Name = user.Name;
+            }
 
-                if (!store_.Users.Any(u => u.UserId == post.AuthorId)) {
-                    return BadRequest("User not found");
+            if (!string.IsNullOrWhiteSpace(user.Email)) {
+                if (!Regex.IsMatch(user.Email, @"^\w+@\w+\.\w{1,}$")) {
+                    return BadRequest("Email must consist only of A-Z, a-z, 0-9 and _");
                 }
 
-                dbPost.AuthorId = post.AuthorId;
-            }
-
-            if (!string.IsNullOrWhiteSpace(post.Title)) {
-                dbPost.Title = post.Title;
-            }
-
-            if (!string.IsNullOrWhiteSpace(post.Body)) {
-                dbPost.Body = post.Body;
-            }
-
-            if (post.Created != DateTime.MinValue) {
-                dbPost.Created = post.Created;
+                dbUser.Email = user.Email;
             }
 
             return Ok();
@@ -187,14 +171,14 @@
                 return Unauthorized();
             }
 
-            var dbPost = store_.Posts.SingleOrDefault(p => p.PostId == id);
+            var dbUser = store_.Users.SingleOrDefault(u => u.UserId == id);
 
-            if (dbPost == null) {
+            if (dbUser == null) {
                 return NotFound();
             }
 
-            store_.Posts.Remove(dbPost);
-            
+            store_.Users.Remove(dbUser);
+
             return Ok();
         }
 

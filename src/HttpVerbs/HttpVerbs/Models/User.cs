@@ -9,10 +9,5 @@ namespace HttpVerbs.Models
         public string Email { get; set; }
 
         public string Name { get; set; }
-
-        public User()
-        {
-            UserId = new Random().Next();
-        }
     }
 }

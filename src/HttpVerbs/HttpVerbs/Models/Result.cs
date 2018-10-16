@@ -1,4 +1,4 @@
-﻿namespace HttpVerbs.Controllers
+﻿namespace HttpVerbs.Models
 {
     internal class Result
     {
