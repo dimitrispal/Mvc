@@ -2,50 +2,54 @@
     ViewData["Title"] = "Home Page";
 }
 
+@{ 
+    var url = "https://httpverbs.azurewebsites.net";
+}
+
 <h2>Tokens</h2>
 
-<h3>Get Token</h3>
-POST /token
+<p><b>Get Token: </b>
+POST @url/tokens</p>
 
-<h3>Set X-Token HTTP Header to token value</h3>
-X-Token: &lt;tokenId&gt;
+<p><b>Set X-Token HTTP Header to token value</b>
+X-Token: &lt;tokenId&gt;</p>
 
 <h2>Posts</h2>
 
-<h3>Get Posts</h3>
-GET /posts
+<p><b>Get Posts: </b>
+GET @url/posts</p>
 
-<h3>Get specific post</h3>
-GET /posts/{id}
+<p><b>Get specific post: </b>
+GET @url/posts/{id}</p>
 
-<h3>Get post of specific author</h3>
-GET /posts?authorId={authorId}
+<p><b>Get post of specific author: </b>
+GET @url/posts?authorId={authorId}</p>
 
-<h3>Get post tags</h3>
-GET /posts/{id}/tags
+<p><b>Get post tags: </b>
+GET @url/posts/{id}/tags</p>
 
-<h3>Create Post</h3>
-POST /posts
+<p><b>Create Post: </b>
+POST @url/posts</p>
 
-<h3>Update (PUT) Post</h3>
-PUT /posts/{id}
+<p><b>Update (PUT) Post: </b>
+PUT @url/posts/{id}</p>
 
-<h3>Update (Patch) Post</h3>
-PATCH /posts/{id}
+<p><b>Update (Patch) Post: </b>
+PATCH @url/posts/{id}</p>
 
 <h2>Users</h2>
 
-<h3>Get users</h3>
-GET /users
+<p><b>Get users: </b>
+GET @url/users</p>
 
-<h3>Get specific user</h3>
-GET /users/{id}
+<p><b>Get specific user: </b>
+GET @url/users/{id}</p>
 
-<h3>Create User</h3>
-POST /users
+<p><b>Create User: </b>
+POST @url/users</p>
 
-<h3>Update (PUT) User</h3>
-PUT /users/{id}
+<p><b>Update (PUT) User: </b>
+PUT @url/users/{id}</p>
 
-<h3>Update (Patch) User</h3>
-PATCH /users/{id}
+<p><b>Update (Patch) User: </b>
+PATCH @url/users/{id}</p>
