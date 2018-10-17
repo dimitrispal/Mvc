@@ -14,10 +14,10 @@ namespace ViewSamples.Models
         {
             if (!File.Exists(DbName)) {
                 Movies = new List<Movie>();
+            } else {
+                var str = File.ReadAllText(DbName);
+                Movies = JsonConvert.DeserializeObject<List<Movie>>(str);
             }
-
-            var str = File.ReadAllText(DbName);
-            Movies = JsonConvert.DeserializeObject<List<Movie>>(str);
         }
 
         public static bool SaveChanges()
