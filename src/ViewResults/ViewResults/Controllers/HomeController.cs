@@ -32,7 +32,9 @@ namespace ViewResults.Controllers
 
         public IActionResult FileResult()
         {
-            return File("/favicon.ico", "image/x-icon"); // to download, add: "Content-Disposition: inline/attachment/attachment;filename="filename.jpg"
+            // to download, add third parameter with name, e.g "filename.jpg". 
+            // This will also change Content-Disposition header from inline to attachemnt.
+            return File("/favicon.ico", "image/x-icon");
         }
 
         [HttpGet("/api/movies")] // overrides default route
