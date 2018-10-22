@@ -128,6 +128,7 @@
             }
 
             dbPost.Body = post.Body;
+            dbPost.Tags = post.Tags;
             dbPost.Title = post.Title;
             dbPost.Created = post.Created;
             dbPost.AuthorId = post.AuthorId;
@@ -169,6 +170,10 @@
 
             if (!string.IsNullOrWhiteSpace(post.Body)) {
                 dbPost.Body = post.Body;
+            }
+
+            if (post.Tags != null) {
+                dbPost.Tags = post.Tags;
             }
 
             if (post.Created != DateTime.MinValue) {
