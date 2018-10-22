@@ -13,6 +13,9 @@
     public class UsersController : Controller
     {
         private Store store_;
+        private const string EmailRegex = @"^\w+@\w+\.\w{1,}$";
+        private const string EmailValidationError = "Must be a valid e-mail address";
+        private const string CannotSpecifyUserIdError = "Cannot specify User Id manually";
 
         [HttpGet("{id?}")]
         public ActionResult Index(int? id)
@@ -46,7 +49,7 @@
             }
 
             if (user.UserId != 0) {
-                return BadRequest("Cannot specify User Id manually");
+                return BadRequest(CannotSpecifyUserIdError);
             }
 
             // generate random id
@@ -90,8 +93,8 @@
                 return new Result(StatusCodes.Status400BadRequest, "Name cannot be empty");
             }
 
-            if (!Regex.IsMatch(user.Email ?? "", @"^\w+@\w+\.\w{1,}$")) {
-                return new Result(StatusCodes.Status400BadRequest, "Email must consist only of A-Z, a-z, 0-9 and _");
+            if (!Regex.IsMatch(user.Email ?? "", EmailRegex)) {
+                return new Result(StatusCodes.Status400BadRequest, EmailValidationError);
             }
 
             return new Result(StatusCodes.Status200OK);
@@ -113,7 +116,7 @@
             }
 
             if (user.UserId != 0) {
-                return BadRequest("Cannot specify userId in body");
+                return BadRequest(CannotSpecifyUserIdError);
             }
 
             var result = ValidateUser(user);
@@ -144,7 +147,7 @@
             }
 
             if (user.UserId != 0) {
-                return BadRequest("Cannot specify userId in body");
+                return BadRequest(CannotSpecifyUserIdError);
             }
 
             if (!string.IsNullOrWhiteSpace(user.Name)) {
@@ -152,8 +155,8 @@
             }
 
             if (!string.IsNullOrWhiteSpace(user.Email)) {
-                if (!Regex.IsMatch(user.Email, @"^\w+@\w+\.\w{1,}$")) {
-                    return BadRequest("Email must consist only of A-Z, a-z, 0-9 and _");
+                if (!Regex.IsMatch(user.Email, EmailRegex)) {
+                    return BadRequest(EmailValidationError);
                 }
 
                 dbUser.Email = user.Email;
