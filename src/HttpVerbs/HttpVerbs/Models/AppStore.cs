@@ -6,6 +6,11 @@ namespace HttpVerbs.Models
     public class AppStore
     {
         public static Dictionary<long, Store> Store = new Dictionary<long, Store>();
+
+        static AppStore()
+        {
+            Store.Add(0, new Store());
+        }
     }
 
     public class Store
